@@ -1,6 +1,5 @@
 import ssl
 from dataclasses import dataclass
-import time
 import socket
 import re
 
@@ -53,41 +52,15 @@ def decode_message(message: str) -> Event:
     return msg
 
 
-def open_encryped(hostname, port, path):
+def open(hostname: str, port: int, path: str, encrypted: bool = False):
     BUFSIZE = 8192
-    context = ssl.create_default_context()
-    with socket.create_connection((hostname, port)) as sock:
-        with context.wrap_socket(sock, server_hostname=hostname) as ssock:
-            ssock.send(str.encode(f"GET {path} HTTP/1.1\n\n"))
-            ssock.setblocking(False)
-            running = True
-            data: bytes = b''
-            first_iter = True
-            messages: list[Event] = []
-
-            while running:
-                try:
-                    while True:
-                        data += ssock.recv(BUFSIZE)
-                        if len(data) == 0:
-                            running = False
-                            break
-                        if first_iter:
-                            first_iter = False
-                            first_message = data.split(str.encode("\r\n\r\n"))
-                            if len(first_message) > 1:
-                                data = first_message[1]
-                        messages = list(map(decode_message, parse_chunks(data)))
-                        yield messages
-                        data = b''
-                        messages = []
-                except BlockingIOError:
-                    yield None
-
-
-def open_unencrypted(hostname, port, path):
-    BUFSIZE = 8192
-    with socket.create_connection((hostname, port)) as s:
+    sock = None
+    if not encrypted:
+        context = ssl.create_default_context()
+        sock = context.wrap_socket(socket.create_connection((hostname, port)), server_hostname=hostname) 
+    else:
+        sock = socket.create_connection((hostname, port))
+    with sock  as s:
         s.send(str.encode(f"GET {path} HTTP/1.1\n\n"))
         s.setblocking(False)
         running = True
