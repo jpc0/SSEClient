@@ -55,7 +55,7 @@ def decode_message(message: str) -> Event:
 def open(hostname: str, port: int, path: str, encrypted: bool = False):
     BUFSIZE = 8192
     sock = None
-    if not encrypted:
+    if encrypted:
         context = ssl.create_default_context()
         sock = context.wrap_socket(socket.create_connection((hostname, port)), server_hostname=hostname) 
     else:
