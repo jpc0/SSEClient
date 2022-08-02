@@ -16,8 +16,6 @@ def parse_chunks(data: bytes) -> list[str]:
     split_data = data.split(str.encode("\r\n"))
     messages = []
     for i in range(len(split_data)):
-        if i % 2 == 0:
-            continue
         messages.append(split_data[i].decode())
     return messages
 
@@ -61,7 +59,7 @@ def open(hostname: str, port: int, path: str, encrypted: bool = False):
     else:
         sock = socket.create_connection((hostname, port))
     with sock  as s:
-        s.send(str.encode(f"GET {path} HTTP/1.0\r\nConnection: keep-alive\r\n\r\n"))
+        s.send(str.encode(f"GET {path} HTTP/1.0\r\n\r\n"))
         s.setblocking(False)
         running = True
         data: bytes = b''
