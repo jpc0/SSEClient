@@ -59,7 +59,7 @@ def open(hostname: str, port: int, path: str, encrypted: bool = False):
     else:
         sock = socket.create_connection((hostname, port))
     with sock  as s:
-        s.send(str.encode(f"GET {path} HTTP/1.0\r\n\r\n"))
+        s.send(str.encode(f"GET {path} HTTP/1.1\r\nHost: {hostname}\r\n\r\n"))
         s.setblocking(False)
         running = True
         data: bytes = b''
