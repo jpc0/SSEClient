@@ -13,7 +13,8 @@ class Event:
 
 
 def parse_chunks(data: bytes) -> list[str]:
-    split_data = data.split(str.encode("\r\n"))
+    print(data)
+    split_data = data.split(str.encode("\n\n"))
     messages = []
     for i in range(len(split_data)):
         messages.append(split_data[i].decode())
